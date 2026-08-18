@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yasmeen-learning.com</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        header {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .brand-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 22px;
+            height: 22px;
+            fill: #38bdf8;
+        }
+
+        .brand-title {
+            font-size: 1rem;
+            color: #f8fafc;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        aside {
+            width: 320px;
+            background-color: #1b2430;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #0f172a;
+            overflow-y: auto;
+        }
+
+        .sidebar-top {
+            padding: 12px 16px;
+            background-color: #111827;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .dashboard-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #38bdf8;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            padding: 10px 14px;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .dashboard-nav-item:hover, 
+        .dashboard-nav-item.active {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+        }
+
+        .unit-list {
+            list-style: none;
+        }
+
+        .unit-header {
+            padding: 16px 20px;
+            font-size: 0.90rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #111827;
+            border-bottom: 1px solid #1f2937;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .unit-header:hover {
+            background-color: #1f2937;
+        }
+
+        .unit-title-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .unit-icon {
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+        }
+
+        .unit-arrow {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            transition: transform 0.2s ease;
+        }
+
+        .unit-tree {
+            list-style: none;
+            display: none;
+        }
+
+        .unit-group.open .unit-tree {
+            display: block;
+        }
+
+        .unit-group.open .unit-arrow {
+            transform: rotate(180deg);
+        }
+
+        .lesson-header {
+            padding: 12px 20px 12px 28px;
+            background-color: #1b2430;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.80rem;
+            color: #e2e8f0;
+            border-bottom: 1px solid #283545;
+            transition: background-color 0.2s ease;
+        }
+
+        .lesson-header:hover {
+            background-color: #232f3e;
+        }
+
+        .lesson-arrow {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            transition: transform 0.2s ease;
+        }
+
+        .sub-tree {
+            list-style: none;
+            display: none;
+            background-color: #151c24;
+        }
+
+        .lesson-group.open .sub-tree {
+            display: block;
+        }
+
+        .lesson-group.open .lesson-arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px 10px 42px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.80rem;
+            border-bottom: 1px solid #1e293b;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            gap: 12px;
+        }
+
+        .nav-item:hover {
+            background-color: #1e293b;
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        .status-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .status-icon.active-dot {
+            color: #38bdf8;
+        }
+
+        .status-icon.upcoming {
+            color: #64748b;
+        }
+
+        .status-icon.completed {
+            color: #2ecc71;
+        }
+
+        main {
+            flex: 1;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#" onclick="resetToHome(); return false;" class="brand-link">
+        <svg class="brand-logo" viewBox="0 0 24 24">
+            <path d="M12 2C11.5 5 9 7.5 6 8c3 0.5 5.5 3 6 6 0.5-3 3-5.5 6-6-3-0.5-5.5-3-6-6z" />
+            <path d="M12 14c-0.3 2-1.8 3.7-3.8 4 2 0.3 3.5 1.8 3.8 3.8 0.3-2 1.8-3.5 3.8-3.8-2-0.3-3.5-1.8-3.8-4z" opacity="0.7"/>
+        </svg>
+        <span class="brand-title">yasmeen-learning.com</span>
+    </a>
+</header>
+
+<div class="main-container">
+    <aside>
+        <div class="sidebar-top">
+            <a href="#" class="dashboard-nav-item" id="btn-progress-dashboard" onclick="loadProgressDashboard(this); return false;">
+                <span>📊</span>
+                <span>Progress Dashboard</span>
+            </a>
+        </div>
+        <ul class="unit-list" id="sidebar-container"></ul>
+    </aside>
+
+    <main>
+        <iframe 
+            id="content-frame" 
+            src="./landing.html" 
+            allow="fullscreen *;" 
+            allowfullscreen="true">
+        </iframe>
+    </main>
+</div>
+
+<script>
+    const courseData = [
+        {
+            id: "00",
+            title: "0: The Art of Statistics",
+            lessons: [
+                { 
+                    title: "1. Collecting Data", 
+                    items: [
+                        { name: "Lesson", path: "./lesson_00_01/lesson/lesson.html" },
+                        { name: "Explain", path: "./lesson_00_01/explain/explain.html" },
+                        { name: "Quiz", path: "./lesson_00_01/quiz/quiz.html" }
+                    ]
+                },
+                { title: "2. Organizing Data" },
+                { title: "3. Presenting Data" },
+                { title: "4. Analyzing Data" },
+                { title: "5. Interpreting Data" },
+                { title: "6. Finding Patterns" },
+                { title: "7. Decision Making" }
+            ]
+        },
+        {
+            id: "01",
+            title: "1-1: Correlation",
+            lessons: [
+                { title: "1. Introduction" }, { title: "2. Scatter diagram" }, { title: "3. Correlation" }, 
+                { title: "4. Linear Correlation" }, { title: "5. Direct Correlation" }, { title: "6. Inverse Correlation" }, 
+                { title: "7. Correlation Coefficient" }, { title: "8. Pearson's Method" }, { title: "9. Spearman's Method" }
+            ]
+        },
+        {
+            id: "02",
+            title: "1-2: Regression",
+            lessons: [
+                { title: "1. Introduction" }, { title: "2. Regression" }, { title: "3. Types of Regression" }, 
+                { title: "4. Method of Least Squares" }, { title: "5. Regression Line" }
+            ]
+        },
+        { id: "03", title: "2-1: Stem-and-Leaf", lessons: [{ title: "1. Introduction" }] },
+        { id: "04", title: "2-2: Quartile", lessons: [{ title: "1. Introduction" }] },
+        { id: "05", title: "2-3: Semi-inter Quartile Range", lessons: [{ title: "1. Introduction" }] },
+        { id: "06", title: "3-1: Probability", lessons: [{ title: "1. Introduction" }] },
+        { id: "07", title: "3-2: Conditional Probability", lessons: [{ title: "1. Introduction" }] },
+        { id: "08", title: "3-3: Independent Events", lessons: [{ title: "1. Introduction" }] },
+        { id: "09", title: "4-1: Discrete Random Variable", lessons: [{ title: "1. Introduction" }] },
+        { id: "10", title: "4-2: Expectation (mean) and Variance", lessons: [{ title: "1. Introduction" }] },
+        { id: "11", title: "4-3: Geometric and Binomial Distributions", lessons: [{ title: "1. Introduction" }] },
+        { id: "12", title: "4-4: Continuous Random Variable", lessons: [{ title: "1. Introduction" }] },
+        { id: "13", title: "5-1: Normal Distribution", lessons: [{ title: "1. Introduction" }] },
+        { id: "14", title: "5-2: Normal Distribution Applications", lessons: [{ title: "1. Introduction" }] },
+        { id: "15", title: "5-3: Estimation and Confidence Intervals", lessons: [{ title: "1. Introduction" }] }
+    ];
+
+    function isUrlVisited(url) {
+        try {
+            const visited = JSON.parse(localStorage.getItem('yasmeen_visited') || '[]');
+            const cleanTarget = url.replace(/^(\.\/|\/)/, '').toLowerCase();
+            return visited.some(vPath => vPath.replace(/^(\.\/|\/)/, '').toLowerCase().endsWith(cleanTarget));
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function renderSidebar() {
+        const container = document.getElementById('sidebar-container');
+        let html = '';
+
+        courseData.forEach((unit) => {
+            html += `
+            <li class="unit-group">
+                <div class="unit-header" onclick="toggleUnit(this)" role="button" tabindex="0">
+                    <div class="unit-title-container">
+                        <span class="unit-icon" title="Unit Contents">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </span>
+                        <span>${unit.title}</span>
+                    </div>
+                    <span class="unit-arrow">▼</span>
+                </div>
+                <ul class="unit-tree">`;
+
+            unit.lessons.forEach((lesson) => {
+                const lessonTitle = lesson.title || lesson;
+                const hasItems = lesson.items && lesson.items.length > 0;
+
+                html += `
+                    <li class="lesson-group">
+                        <div class="lesson-header" onclick="toggleLesson(this)" role="button" tabindex="0">
+                            <span>${lessonTitle}</span>
+                            <span class="lesson-arrow">▼</span>
+                        </div>
+                        <ul class="sub-tree">`;
+
+                if (hasItems) {
+                    lesson.items.forEach((item) => {
+                        html += `<li><a href="#" class="nav-item" onclick="loadContent(this, '${item.path}')"><span class="status-icon upcoming">○</span><span class="item-title">${item.name}</span></a></li>`;
+                    });
+                } else {
+                    html += `<li><span class="nav-item" style="color: #64748b; font-style: italic; cursor: default;"><span class="status-icon">⏳</span><span>Coming soon</span></span></li>`;
+                }
+
+                html += `</ul></li>`;
+            });
+
+            html += `</ul></li>`;
+        });
+
+        container.innerHTML = html;
+        restoreLastSession();
+        updateSidebarStatusIcons();
+    }
+
+    function toggleUnit(headerElem) {
+        const currentUnit = headerElem.closest('.unit-group');
+        const isAlreadyOpen = currentUnit.classList.contains('open');
+
+        document.querySelectorAll('.unit-group').forEach(group => group.classList.remove('open'));
+
+        if (!isAlreadyOpen) {
+            currentUnit.classList.add('open');
+        }
+    }
+
+    function toggleLesson(headerElem) {
+        const currentLesson = headerElem.closest('.lesson-group');
+        const parentUnit = currentLesson.closest('.unit-group');
+        const isAlreadyOpen = currentLesson.classList.contains('open');
+
+        parentUnit.querySelectorAll('.lesson-group').forEach(group => group.classList.remove('open'));
+
+        if (!isAlreadyOpen) {
+            currentLesson.classList.add('open');
+        }
+    }
+
+    function updateSidebarStatusIcons() {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const onclickStr = item.getAttribute('onclick') || '';
+            const match = onclickStr.match(/loadContent\(this,\s*['"]([^'"]+)['"]\)/);
+            if (!match) return;
+
+            const url = match[1];
+            const icon = item.querySelector('.status-icon');
+            if (!icon) return;
+
+            const isActive = item.classList.contains('active');
+            const isCompleted = isUrlVisited(url);
+
+            if (isCompleted) {
+                icon.className = 'status-icon completed';
+                icon.textContent = '✓';
+            } else if (isActive) {
+                icon.className = 'status-icon active-dot';
+                icon.textContent = '●';
+            } else {
+                icon.className = 'status-icon upcoming';
+                icon.textContent = '○';
+            }
+        });
+    }
+
+    function clearActiveStates() {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const dashBtn = document.getElementById('btn-progress-dashboard');
+        if (dashBtn) dashBtn.classList.remove('active');
+    }
+
+    function loadProgressDashboard(elem) {
+        document.getElementById('content-frame').src = './progress_report.html';
+        localStorage.setItem('yasmeen_last_url', './progress_report.html');
+
+        clearActiveStates();
+        if (elem) elem.classList.add('active');
+    }
+
+    function loadContent(linkElem, url) {
+        document.getElementById('content-frame').src = url;
+        localStorage.setItem('yasmeen_last_url', url);
+
+        clearActiveStates();
+        linkElem.classList.add('active');
+
+        updateSidebarStatusIcons();
+    }
+
+    function restoreLastSession() {
+        const savedUrl = localStorage.getItem('yasmeen_last_url');
+        if (!savedUrl) return;
+
+        if (savedUrl === './progress_report.html') {
+            const dashBtn = document.getElementById('btn-progress-dashboard');
+            loadProgressDashboard(dashBtn);
+            return;
+        }
+
+        const targetLink = Array.from(document.querySelectorAll('.nav-item')).find(a => 
+            a.getAttribute('onclick') && a.getAttribute('onclick').includes(savedUrl)
+        );
+
+        if (targetLink) {
+            const lessonGroup = targetLink.closest('.lesson-group');
+            const unitGroup = targetLink.closest('.unit-group');
+
+            if (unitGroup) unitGroup.classList.add('open');
+            if (lessonGroup) lessonGroup.classList.add('open');
+
+            loadContent(targetLink, savedUrl);
+        }
+    }
+
+    function resetToHome() {
+        localStorage.removeItem('yasmeen_last_url');
+        document.getElementById('content-frame').src = './landing.html';
+
+        document.querySelectorAll('.unit-group').forEach(g => g.classList.remove('open'));
+        document.querySelectorAll('.lesson-group').forEach(g => g.classList.remove('open'));
+
+        clearActiveStates();
+        updateSidebarStatusIcons();
+    }
+
+    window.addEventListener('message', (e) => {
+        if (e.data === 'MODULE_COMPLETED') updateSidebarStatusIcons();
+    });
+    window.addEventListener('focus', updateSidebarStatusIcons);
+    window.addEventListener('storage', updateSidebarStatusIcons);
+
+    setInterval(updateSidebarStatusIcons, 1000);
+
+    renderSidebar();
+</script>
+</body>
+</html>

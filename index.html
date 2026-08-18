@@ -16,20 +16,48 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             color: #1e293b;
+            overflow: hidden;
         }
 
         header {
             background-color: #0f172a;
             color: #ffffff;
-            padding: 12px 20px;
+            padding: 10px 20px;
             font-size: 1rem;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #1e293b;
+            z-index: 10;
+            height: 50px;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .contents-toggle-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #38bdf8;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .contents-toggle-btn:hover {
+            background: #38bdf8;
+            color: #0f172a;
         }
 
         .brand-link {
@@ -51,36 +79,137 @@
             color: #f8fafc;
         }
 
-        .header-lesson-title {
-            font-size: 0.9rem;
-            color: #38bdf8;
-            font-weight: 500;
-            max-width: 60%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
         .main-container {
             display: flex;
             flex: 1;
+            position: relative;
             overflow: hidden;
+            height: calc(100vh - 50px);
         }
 
+        /* Split Workspace: 30% Board (Left) | 70% Content (Right) */
+        .workspace-split {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            gap: 8px;
+            padding: 8px;
+            background-color: #f1f5f9; /* Uniform light gray */
+        }
+
+        /* Classic Lighter Green Chalkboard Panel (24% - LEFT) */
+        .board-panel {
+            flex: 0 0 calc(24% - 4px);
+            height: 100%;
+            background-color: #255f41; /* Lighter green degree */
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 16px 16px;
+            border: 5px solid #2d1810;
+            border-radius: 8px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            color: #ffffff;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        /* Site font & pure white for Board Title */
+        .board-title-text {
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .board-pin {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .board-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #ffffff;
+            flex: 1;
+        }
+
+        /* Content Panel (74% - RIGHT) */
+        .content-panel {
+            flex: 0 0 calc(74% - 4px);
+            height: 100%;
+            background-color: #f1f5f9; /* Same light gray background */
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px; /* Minimal padding around iframe */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 6px;
+            background-color: #ffffff;
+        }
+
+        /* Floating Sidebar Drawer (Covers Board on Left) */
         aside {
+            position: absolute;
+            top: 0;
+            left: -340px;
             width: 320px;
+            height: 100%;
             background-color: #1b2430;
             color: #e2e8f0;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #0f172a;
             overflow-y: auto;
+            z-index: 100;
+            transition: left 0.3s ease;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+        }
+
+        aside.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 90;
+            display: none;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
         }
 
         .sidebar-top {
             padding: 12px 16px;
             background-color: #111827;
             border-bottom: 1px solid #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .dashboard-nav-item {
@@ -91,27 +220,18 @@
             font-weight: 600;
             font-size: 0.85rem;
             text-decoration: none;
-            padding: 10px 14px;
+            padding: 8px 12px;
             background-color: #1e293b;
             border: 1px solid #334155;
             border-radius: 6px;
-            transition: all 0.2s ease;
+            flex: 1;
         }
 
-        .dashboard-nav-item:hover, 
-        .dashboard-nav-item.active {
-            background-color: #38bdf8;
-            color: #0f172a;
-            border-color: #38bdf8;
-        }
-
-        .unit-list {
-            list-style: none;
-        }
+        .unit-list { list-style: none; }
 
         .unit-header {
-            padding: 16px 20px;
-            font-size: 0.90rem;
+            padding: 14px 18px;
+            font-size: 0.88rem;
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -120,148 +240,60 @@
             border-bottom: 1px solid #1f2937;
             cursor: pointer;
             user-select: none;
-            transition: background-color 0.2s ease;
         }
 
-        .unit-header:hover {
-            background-color: #1f2937;
-        }
-
-        .unit-title-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .unit-icon {
-            color: #38bdf8;
-            display: flex;
-            align-items: center;
-        }
-
-        .unit-arrow {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            transition: transform 0.2s ease;
-        }
-
-        .unit-tree {
-            list-style: none;
-            display: none;
-        }
-
-        .unit-group.open .unit-tree {
-            display: block;
-        }
-
-        .unit-group.open .unit-arrow {
-            transform: rotate(180deg);
-        }
+        .unit-tree { list-style: none; display: none; }
+        .unit-group.open .unit-tree { display: block; }
 
         .lesson-header {
-            padding: 12px 20px 12px 28px;
+            padding: 10px 18px 10px 24px;
             background-color: #1b2430;
             cursor: pointer;
-            user-select: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.80rem;
             color: #e2e8f0;
             border-bottom: 1px solid #283545;
-            transition: background-color 0.2s ease;
         }
 
-        .lesson-header:hover {
-            background-color: #232f3e;
-        }
-
-        .lesson-arrow {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            transition: transform 0.2s ease;
-        }
-
-        .sub-tree {
-            list-style: none;
-            display: none;
-            background-color: #151c24;
-        }
-
-        .lesson-group.open .sub-tree {
-            display: block;
-        }
-
-        .lesson-group.open .lesson-arrow {
-            transform: rotate(180deg);
-        }
+        .sub-tree { list-style: none; display: none; background-color: #151c24; }
+        .lesson-group.open .sub-tree { display: block; }
 
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 10px 20px 10px 42px;
+            padding: 8px 18px 8px 36px;
             color: #cbd5e1;
             text-decoration: none;
             font-size: 0.80rem;
             border-bottom: 1px solid #1e293b;
-            transition: background-color 0.15s ease, color 0.15s ease;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .nav-item:hover {
-            background-color: #1e293b;
-            color: #ffffff;
-        }
+        .nav-item.active { background-color: #000000; color: #ffffff; }
 
-        .nav-item.active {
-            background-color: #000000;
-            color: #ffffff;
-        }
+        .status-icon { width: 16px; text-align: center; }
+        .status-icon.active-dot { color: #38bdf8; }
+        .status-icon.completed { color: #2ecc71; }
+        .status-icon.upcoming { color: #64748b; }
 
-        .status-icon {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-weight: bold;
-        }
-
-        .status-icon.active-dot {
-            color: #38bdf8;
-        }
-
-        .status-icon.upcoming {
-            color: #64748b;
-        }
-
-        .status-icon.completed {
-            color: #2ecc71;
-        }
-
-        main {
-            flex: 1;
-            background-color: #f8fafc;
-            position: relative;
-        }
-
-        /* Start Overlay Styles */
-        .start-overlay {
+        /* Mandatory Fullscreen Overlay */
+        .fullscreen-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.88);
+            background-color: rgba(15, 23, 42, 0.96);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 999;
-            backdrop-filter: blur(4px);
+            z-index: 9999;
+            backdrop-filter: blur(6px);
         }
 
-        .start-overlay.hidden {
+        .fullscreen-overlay.hidden {
             display: none !important;
         }
 
@@ -270,66 +302,109 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 24px;
-            padding: 20px;
-            max-width: 80%;
+            gap: 20px;
+            padding: 30px;
+            max-width: 600px;
         }
 
-        .overlay-title {
+        .overlay-welcome-msg {
             color: #f8fafc;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 600;
-            line-height: 1.4;
+            line-height: 1.5;
+        }
+
+        .overlay-sub-msg {
+            color: #94a3b8;
+            font-size: 1rem;
         }
 
         .start-btn {
             background-color: #2ecc71;
             color: #ffffff;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            padding: 16px 44px;
+            padding: 14px 40px;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
-            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, background-color 0.2s ease;
             letter-spacing: 1px;
         }
 
         .start-btn:hover {
             background-color: #27ae60;
             transform: scale(1.05);
-            box-shadow: 0 12px 30px rgba(46, 204, 113, 0.6);
         }
 
-        .start-btn:active {
-            transform: scale(0.98);
+        /* Mandatory Landscape Mode Notice for Mobile Devices */
+        .rotate-notice {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0f172a;
+            color: #f8fafc;
+            z-index: 99999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .rotate-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            animation: spinRotate 2s infinite ease-in-out;
+        }
+
+        @keyframes spinRotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            .rotate-notice {
+                display: flex;
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- Forced Rotate Notice on Portrait Mobile -->
+<div class="rotate-notice">
+    <div class="rotate-icon">🔄</div>
+    <h2>Please rotate your device</h2>
+    <p style="margin-top: 8px; color: #94a3b8;">For the best learning experience, Yasmeen-learning requires Landscape Mode.</p>
+</div>
+
 <header>
-    <a href="#" onclick="resetToHome(); return false;" class="brand-link">
-        <svg class="brand-logo" viewBox="0 0 24 24">
-            <path d="M12 2C11.5 5 9 7.5 6 8c3 0.5 5.5 3 6 6 0.5-3 3-5.5 6-6-3-0.5-5.5-3-6-6z" />
-            <path d="M12 14c-0.3 2-1.8 3.7-3.8 4 2 0.3 3.5 1.8 3.8 3.8 0.3-2 1.8-3.5 3.8-3.8-2-0.3-3.5-1.8-3.8-4z" opacity="0.7"/>
-        </svg>
-        <span class="brand-title">yasmeen-learning.com</span>
-    </a>
-    <div id="header-lesson-title" class="header-lesson-title"></div>
+    <div class="brand-container">
+        <button class="contents-toggle-btn" onclick="toggleSidebar()">
+            <span>☰</span>
+            <span></span>
+        </button>
+        <a href="#" onclick="resetToHome(); return false;" class="brand-link">
+            <svg class="brand-logo" viewBox="0 0 24 24">
+                <path d="M12 2C11.5 5 9 7.5 6 8c3 0.5 5.5 3 6 6 0.5-3 3-5.5 6-6-3-0.5-5.5-3-6-6z" />
+                <path d="M12 14c-0.3 2-1.8 3.7-3.8 4 2 0.3 3.5 1.8 3.8 3.8 0.3-2 1.8-3.5 3.8-3.8-2-0.3-3.5-1.8-3.8-4z" opacity="0.7"/>
+            </svg>
+            <span class="brand-title">yasmeen-learning.com</span>
+        </a>
+    </div>
 </header>
 
 <div class="main-container">
-    <aside>
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar-drawer">
         <div class="sidebar-top">
-            <a href="#" class="dashboard-nav-item" id="btn-progress-dashboard" onclick="loadProgressDashboard(this); return false;">
+            <a href="#" class="dashboard-nav-item" id="btn-progress-dashboard" onclick="loadProgressDashboard(this); toggleSidebar(); return false;">
                 <span>📊</span>
                 <span>Progress Dashboard</span>
             </a>
@@ -337,24 +412,39 @@
         <ul class="unit-list" id="sidebar-container"></ul>
     </aside>
 
-    <main>
-        <div id="start-overlay" class="start-overlay hidden">
+    <main class="workspace-split">
+        <!-- Mandatory Fullscreen Enforcement Overlay -->
+        <div id="fullscreen-overlay" class="fullscreen-overlay">
             <div class="overlay-card">
-                <div id="overlay-lesson-title" class="overlay-title"></div>
-                <button id="start-btn" class="start-btn" onclick="handleStartClick()">START</button>
+                <div id="overlay-msg-main" class="overlay-welcome-msg">Welcome to yasmeen-learning.com</div>
+                <div id="overlay-msg-sub" class="overlay-sub-msg">To start your course, press here</div>
+                <button id="start-btn" class="start-btn" onclick="requestFullScreenAndStart()">START</button>
             </div>
         </div>
-        <iframe 
-            id="content-frame" 
-            src="./landing.html" 
-            allow="fullscreen *;" 
-            allowfullscreen="true">
-        </iframe>
+
+        <!-- Left Panel: Classic Chalkboard Notes (30%) -->
+        <section class="board-panel">
+            <div class="board-header">
+                <span id="board-title" class="board-title-text">Statistics: Collecting Data</span>
+                <span class="board-pin">📌</span>
+            </div>
+            <div id="board-content" class="board-content"></div>
+        </section>
+
+        <!-- Right Panel: Content Frame (70%) -->
+        <section class="content-panel">
+            <iframe 
+                id="content-frame" 
+                src="./landing.html" 
+                allow="fullscreen *;" 
+                allowfullscreen="true">
+            </iframe>
+        </section>
     </main>
 </div>
 
 <script>
-    let start_id = 0;
+    let isSessionStarted = false;
 
     const courseData = [
         {
@@ -409,6 +499,11 @@
         { id: "15", title: "5-3: Estimation and Confidence Intervals", lessons: [{ title: "1. Introduction" }] }
     ];
 
+    function toggleSidebar() {
+        document.getElementById('sidebar-drawer').classList.toggle('open');
+        document.getElementById('sidebar-overlay').classList.toggle('open');
+    }
+
     function isUrlVisited(url) {
         try {
             const visited = JSON.parse(localStorage.getItem('yasmeen_visited') || '[]');
@@ -426,16 +521,9 @@
         courseData.forEach((unit) => {
             html += `
             <li class="unit-group">
-                <div class="unit-header" onclick="toggleUnit(this)" role="button" tabindex="0">
-                    <div class="unit-title-container">
-                        <span class="unit-icon" title="Unit Contents">
-                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-                            </svg>
-                        </span>
-                        <span>${unit.title}</span>
-                    </div>
-                    <span class="unit-arrow">▼</span>
+                <div class="unit-header" onclick="toggleUnit(this)">
+                    <span>${unit.title}</span>
+                    <span>▼</span>
                 </div>
                 <ul class="unit-tree">`;
 
@@ -445,18 +533,18 @@
 
                 html += `
                     <li class="lesson-group">
-                        <div class="lesson-header" onclick="toggleLesson(this)" role="button" tabindex="0">
+                        <div class="lesson-header" onclick="toggleLesson(this)">
                             <span>${lessonTitle}</span>
-                            <span class="lesson-arrow">▼</span>
+                            <span>▼</span>
                         </div>
                         <ul class="sub-tree">`;
 
                 if (hasItems) {
                     lesson.items.forEach((item) => {
-                        html += `<li><a href="#" class="nav-item" onclick="loadContent(this, '${item.path}')"><span class="status-icon upcoming">○</span><span class="item-title">${item.name}</span></a></li>`;
+                        html += `<li><a href="#" class="nav-item" onclick="loadContent(this, '${item.path}'); toggleSidebar(); return false;"><span class="status-icon upcoming">○</span><span class="item-title">${item.name}</span></a></li>`;
                     });
                 } else {
-                    html += `<li><span class="nav-item" style="color: #64748b; font-style: italic; cursor: default;"><span class="status-icon">⏳</span><span>Coming soon</span></span></li>`;
+                    html += `<li><span class="nav-item" style="color: #64748b; font-style: italic;"><span class="status-icon">⏳</span><span>Coming soon</span></span></li>`;
                 }
 
                 html += `</ul></li>`;
@@ -472,25 +560,17 @@
 
     function toggleUnit(headerElem) {
         const currentUnit = headerElem.closest('.unit-group');
-        const isAlreadyOpen = currentUnit.classList.contains('open');
-
-        document.querySelectorAll('.unit-group').forEach(group => group.classList.remove('open'));
-
-        if (!isAlreadyOpen) {
-            currentUnit.classList.add('open');
-        }
+        const isOpen = currentUnit.classList.contains('open');
+        document.querySelectorAll('.unit-group').forEach(g => g.classList.remove('open'));
+        if (!isOpen) currentUnit.classList.add('open');
     }
 
     function toggleLesson(headerElem) {
         const currentLesson = headerElem.closest('.lesson-group');
         const parentUnit = currentLesson.closest('.unit-group');
-        const isAlreadyOpen = currentLesson.classList.contains('open');
-
-        parentUnit.querySelectorAll('.lesson-group').forEach(group => group.classList.remove('open'));
-
-        if (!isAlreadyOpen) {
-            currentLesson.classList.add('open');
-        }
+        const isOpen = currentLesson.classList.contains('open');
+        parentUnit.querySelectorAll('.lesson-group').forEach(g => g.classList.remove('open'));
+        if (!isOpen) currentLesson.classList.add('open');
     }
 
     function updateSidebarStatusIcons() {
@@ -525,14 +605,28 @@
         if (dashBtn) dashBtn.classList.remove('active');
     }
 
-    function updateTitleDisplay(titleText) {
-        document.getElementById('overlay-lesson-title').textContent = titleText || '';
-        document.getElementById('header-lesson-title').textContent = titleText || '';
+    function updateBoardTitle(titleText) {
+        const boardTitle = document.getElementById('board-title');
+        if (boardTitle) {
+            boardTitle.textContent = titleText || 'Statistics: Collecting Data';
+        }
     }
 
-    function handleStartClick() {
-        start_id = 1;
-        document.getElementById('start-overlay').classList.add('hidden');
+    /* FULLSCREEN STRICT LOGIC */
+    function requestFullScreenAndStart() {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+            docEl.requestFullscreen().catch(() => {});
+        } else if (docEl.mozRequestFullScreen) {
+            docEl.mozRequestFullScreen().catch(() => {});
+        } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen().catch(() => {});
+        } else if (docEl.msRequestFullscreen) {
+            docEl.msRequestFullscreen().catch(() => {});
+        }
+
+        isSessionStarted = true;
+        document.getElementById('fullscreen-overlay').classList.add('hidden');
 
         const iframe = document.getElementById('content-frame');
         if (iframe && iframe.contentWindow) {
@@ -540,18 +634,23 @@
         }
     }
 
-    function showStartOverlay() {
-        start_id = 0;
-        document.getElementById('start-overlay').classList.remove('hidden');
+    function checkFullscreenState() {
+        const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        
+        if (!isFS && isSessionStarted) {
+            document.getElementById('overlay-msg-main').textContent = "You exit Yasmeen-learning.com";
+            document.getElementById('overlay-msg-sub').textContent = "To return to your course, press here";
+            document.getElementById('fullscreen-overlay').classList.remove('hidden');
+        }
     }
 
-    function hideStartOverlay() {
-        document.getElementById('start-overlay').classList.add('hidden');
-    }
+    document.addEventListener('fullscreenchange', checkFullscreenState);
+    document.addEventListener('webkitfullscreenchange', checkFullscreenState);
+    document.addEventListener('mozfullscreenchange', checkFullscreenState);
+    document.addEventListener('MSFullscreenChange', checkFullscreenState);
 
     function loadProgressDashboard(elem) {
-        hideStartOverlay();
-        updateTitleDisplay("Progress Dashboard");
+        updateBoardTitle("Progress Dashboard");
         document.getElementById('content-frame').src = './progress_report.html';
         localStorage.setItem('yasmeen_last_url', './progress_report.html');
 
@@ -560,24 +659,17 @@
     }
 
     function loadContent(linkElem, url) {
-        updateTitleDisplay("");
-        showStartOverlay();
         document.getElementById('content-frame').src = url;
         localStorage.setItem('yasmeen_last_url', url);
 
         clearActiveStates();
         linkElem.classList.add('active');
-
         updateSidebarStatusIcons();
     }
 
     function restoreLastSession() {
         const savedUrl = localStorage.getItem('yasmeen_last_url');
-        if (!savedUrl) {
-            hideStartOverlay();
-            updateTitleDisplay("");
-            return;
-        }
+        if (!savedUrl) return;
 
         if (savedUrl === './progress_report.html') {
             const dashBtn = document.getElementById('btn-progress-dashboard');
@@ -597,15 +689,11 @@
             if (lessonGroup) lessonGroup.classList.add('open');
 
             loadContent(targetLink, savedUrl);
-        } else {
-            hideStartOverlay();
-            updateTitleDisplay("");
         }
     }
 
     function resetToHome() {
-        hideStartOverlay();
-        updateTitleDisplay("");
+        updateBoardTitle("Welcome to classroom!");
         localStorage.removeItem('yasmeen_last_url');
         document.getElementById('content-frame').src = './landing.html';
 
@@ -619,14 +707,17 @@
     window.addEventListener('message', (e) => {
         if (e.data === 'MODULE_COMPLETED') updateSidebarStatusIcons();
         if (e.data && e.data.type === 'SET_TITLE') {
-            updateTitleDisplay(e.data.title);
+            updateBoardTitle(e.data.title);
+        }
+        if (e.data && e.data.type === 'UPDATE_BOARD') {
+            const board = document.getElementById('board-content');
+            if (board && e.data.htmlContent) {
+                board.innerHTML = e.data.htmlContent;
+            }
         }
     });
-    window.addEventListener('focus', updateSidebarStatusIcons);
-    window.addEventListener('storage', updateSidebarStatusIcons);
 
     setInterval(updateSidebarStatusIcons, 1000);
-
     renderSidebar();
 </script>
 </body>

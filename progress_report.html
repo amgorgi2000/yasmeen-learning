@@ -80,7 +80,7 @@
         }
         .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
         }
         .module-item {
@@ -100,8 +100,10 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-        .status-badge.completed { background-color: #d4edda; color: #155724; }
-        .status-badge.pending { background-color: #f8d7da; color: #721c24; }
+        .status-badge.passed { background-color: #d4edda; color: #155724; }
+        .status-badge.failed { background-color: #f8d7da; color: #721c24; }
+        .status-badge.completed { background-color: #e2e8f0; color: #334155; }
+        .status-badge.pending { background-color: #fff3cd; color: #856404; }
         .status-badge.coming-soon { background-color: #f1f5f9; color: #64748b; }
     </style>
 </head>
@@ -189,13 +191,22 @@
         }
     }
 
+    function getProgressObject() {
+        try {
+            return JSON.parse(localStorage.getItem('yasmeen_progress') || '{}');
+        } catch (e) {
+            return {};
+        }
+    }
+
     function cleanPath(p) {
         return p.replace(/^(\.\/|\/)/, '').toLowerCase();
     }
 
     function renderMatrix() {
         const visitedRaw = getVisitedArray();
-        const currentVisitedState = JSON.stringify(visitedRaw);
+        const progressObj = getProgressObject();
+        const currentVisitedState = JSON.stringify(visitedRaw) + JSON.stringify(progressObj);
 
         if (currentVisitedState === cachedVisitedState) return;
         cachedVisitedState = currentVisitedState;
@@ -234,7 +245,19 @@
                 if (hasItems) {
                     lesson.items.forEach(mod => {
                         totalModules++;
-                        const isDone = visitedClean.some(v => v.endsWith(cleanPath(mod.path)));
+                        const cleanedModPath = cleanPath(mod.path);
+                        
+                        // البحث عن تفاصيل النتيجة في yasmeen_progress
+                        let detailData = null;
+                        Object.keys(progressObj).forEach(key => {
+                            if (cleanPath(key).endsWith(cleanedModPath)) {
+                                detailData = progressObj[key];
+                            }
+                        });
+
+                        const isVisited = visitedClean.some(v => v.endsWith(cleanedModPath));
+                        const isDone = detailData ? detailData.completed : isVisited;
+
                         if (isDone) completedModules++;
 
                         const item = document.createElement('div');
@@ -244,8 +267,22 @@
                         modName.innerText = mod.name;
 
                         const badge = document.createElement('span');
-                        badge.className = `status-badge ${isDone ? 'completed' : 'pending'}`;
-                        badge.innerText = isDone ? 'Done ✓' : 'Pending';
+
+                        if (detailData) {
+                            if (detailData.passed) {
+                                badge.className = 'status-badge passed';
+                                badge.innerText = `Passed ✓ (${detailData.score}/${detailData.maxScore})`;
+                            } else {
+                                badge.className = 'status-badge failed';
+                                badge.innerText = `Failed ✘ (${detailData.score}/${detailData.maxScore})`;
+                            }
+                        } else if (isVisited) {
+                            badge.className = 'status-badge completed';
+                            badge.innerText = 'Done ✓';
+                        } else {
+                            badge.className = 'status-badge pending';
+                            badge.innerText = 'Pending';
+                        }
 
                         item.appendChild(modName);
                         item.appendChild(badge);

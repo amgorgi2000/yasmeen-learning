@@ -84,6 +84,10 @@
             background-color: #3498db;
             color: white;
         }
+        .btn-finish {
+            background-color: #2ecc71;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -149,7 +153,16 @@
     }
 
     function navigateSlide(direction) {
-        if (direction === 1 && !slideUnlocked[currentSlideIndex]) return;
+        const isLastSlide = currentSlideIndex === slideImages.length - 1;
+
+        if (direction === 1) {
+            if (!slideUnlocked[currentSlideIndex]) return;
+
+            if (isLastSlide) {
+                finishLesson();
+                return;
+            }
+        }
 
         currentSlideIndex += direction;
         if (currentSlideIndex < 0) currentSlideIndex = 0;
@@ -164,8 +177,19 @@
 
         const isLastSlide = currentSlideIndex === slideImages.length - 1;
 
-        nextBtn.innerText = 'Next';
-        nextBtn.disabled = isLastSlide || !slideUnlocked[currentSlideIndex];
+        if (isLastSlide) {
+            nextBtn.innerText = 'Finish';
+            nextBtn.className = 'btn-finish';
+            nextBtn.disabled = false;
+        } else {
+            nextBtn.innerText = 'Next';
+            nextBtn.className = 'btn-next';
+            nextBtn.disabled = !slideUnlocked[currentSlideIndex];
+        }
+    }
+
+    function finishLesson() {
+        window.parent.postMessage({ type: 'LESSON_FINISHED' }, '*');
     }
 
     function recordLessonCompletion() {

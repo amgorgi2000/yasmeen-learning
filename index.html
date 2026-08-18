@@ -504,6 +504,11 @@
         document.getElementById('sidebar-overlay').classList.toggle('open');
     }
 
+    function openSidebar() {
+        document.getElementById('sidebar-drawer').classList.add('open');
+        document.getElementById('sidebar-overlay').classList.add('open');
+    }
+
     function isUrlVisited(url) {
         try {
             const visited = JSON.parse(localStorage.getItem('yasmeen_visited') || '[]');
@@ -706,6 +711,10 @@
 
     window.addEventListener('message', (e) => {
         if (e.data === 'MODULE_COMPLETED') updateSidebarStatusIcons();
+        if (e.data && e.data.type === 'LESSON_FINISHED') {
+            updateSidebarStatusIcons();
+            openSidebar();
+        }
         if (e.data && e.data.type === 'SET_TITLE') {
             updateBoardTitle(e.data.title);
         }

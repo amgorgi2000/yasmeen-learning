@@ -133,7 +133,6 @@
 
 <div class="lesson-container" id="lesson-container">
     <div id="lesson-header">
-        <h1 id="main-title">Statistics: Collecting Data</h1>
         <button class="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
     </div>
 
@@ -297,6 +296,13 @@
 
     window.onload = updateSlide;
 </script>
-
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        window.parent.postMessage({
+            type: 'SET_TITLE',
+            title: document.title
+        }, '*');
+    });
+</script>
 </body>
 </html>

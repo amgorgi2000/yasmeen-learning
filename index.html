@@ -51,6 +51,16 @@
             color: #f8fafc;
         }
 
+        .header-lesson-title {
+            font-size: 0.9rem;
+            color: #38bdf8;
+            font-weight: 500;
+            max-width: 60%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .main-container {
             display: flex;
             flex: 1;
@@ -236,6 +246,66 @@
             position: relative;
         }
 
+        /* Start Overlay Styles */
+        .start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .start-overlay.hidden {
+            display: none !important;
+        }
+
+        .overlay-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            padding: 20px;
+            max-width: 80%;
+        }
+
+        .overlay-title {
+            color: #f8fafc;
+            font-size: 1.3rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .start-btn {
+            background-color: #2ecc71;
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 16px 44px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            letter-spacing: 1px;
+        }
+
+        .start-btn:hover {
+            background-color: #27ae60;
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(46, 204, 113, 0.6);
+        }
+
+        .start-btn:active {
+            transform: scale(0.98);
+        }
+
         iframe {
             width: 100%;
             height: 100%;
@@ -253,6 +323,7 @@
         </svg>
         <span class="brand-title">yasmeen-learning.com</span>
     </a>
+    <div id="header-lesson-title" class="header-lesson-title"></div>
 </header>
 
 <div class="main-container">
@@ -267,6 +338,12 @@
     </aside>
 
     <main>
+        <div id="start-overlay" class="start-overlay hidden">
+            <div class="overlay-card">
+                <div id="overlay-lesson-title" class="overlay-title"></div>
+                <button id="start-btn" class="start-btn" onclick="handleStartClick()">START</button>
+            </div>
+        </div>
         <iframe 
             id="content-frame" 
             src="./landing.html" 
@@ -277,6 +354,8 @@
 </div>
 
 <script>
+    let start_id = 0;
+
     const courseData = [
         {
             id: "00",
@@ -446,7 +525,33 @@
         if (dashBtn) dashBtn.classList.remove('active');
     }
 
+    function updateTitleDisplay(titleText) {
+        document.getElementById('overlay-lesson-title').textContent = titleText || '';
+        document.getElementById('header-lesson-title').textContent = titleText || '';
+    }
+
+    function handleStartClick() {
+        start_id = 1;
+        document.getElementById('start-overlay').classList.add('hidden');
+
+        const iframe = document.getElementById('content-frame');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'START_LESSON', start_id: 1, lock_duration: 5000 }, '*');
+        }
+    }
+
+    function showStartOverlay() {
+        start_id = 0;
+        document.getElementById('start-overlay').classList.remove('hidden');
+    }
+
+    function hideStartOverlay() {
+        document.getElementById('start-overlay').classList.add('hidden');
+    }
+
     function loadProgressDashboard(elem) {
+        hideStartOverlay();
+        updateTitleDisplay("Progress Dashboard");
         document.getElementById('content-frame').src = './progress_report.html';
         localStorage.setItem('yasmeen_last_url', './progress_report.html');
 
@@ -455,6 +560,8 @@
     }
 
     function loadContent(linkElem, url) {
+        updateTitleDisplay("");
+        showStartOverlay();
         document.getElementById('content-frame').src = url;
         localStorage.setItem('yasmeen_last_url', url);
 
@@ -466,7 +573,11 @@
 
     function restoreLastSession() {
         const savedUrl = localStorage.getItem('yasmeen_last_url');
-        if (!savedUrl) return;
+        if (!savedUrl) {
+            hideStartOverlay();
+            updateTitleDisplay("");
+            return;
+        }
 
         if (savedUrl === './progress_report.html') {
             const dashBtn = document.getElementById('btn-progress-dashboard');
@@ -486,10 +597,15 @@
             if (lessonGroup) lessonGroup.classList.add('open');
 
             loadContent(targetLink, savedUrl);
+        } else {
+            hideStartOverlay();
+            updateTitleDisplay("");
         }
     }
 
     function resetToHome() {
+        hideStartOverlay();
+        updateTitleDisplay("");
         localStorage.removeItem('yasmeen_last_url');
         document.getElementById('content-frame').src = './landing.html';
 
@@ -502,6 +618,9 @@
 
     window.addEventListener('message', (e) => {
         if (e.data === 'MODULE_COMPLETED') updateSidebarStatusIcons();
+        if (e.data && e.data.type === 'SET_TITLE') {
+            updateTitleDisplay(e.data.title);
+        }
     });
     window.addEventListener('focus', updateSidebarStatusIcons);
     window.addEventListener('storage', updateSidebarStatusIcons);

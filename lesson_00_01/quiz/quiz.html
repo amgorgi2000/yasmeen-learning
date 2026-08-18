@@ -225,7 +225,6 @@
 
 <div class="quiz-container" id="quiz-container">
     <div id="quiz-header">
-        <h1 id="main-title">Statistics: Collecting Data - Quiz</h1>
         <button class="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
     </div>
 
@@ -673,6 +672,13 @@
 
     window.onload = generateQuiz;
 </script>
-
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        window.parent.postMessage({
+            type: 'SET_TITLE',
+            title: document.title
+        }, '*');
+    });
+</script>
 </body>
 </html>

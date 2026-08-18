@@ -102,6 +102,7 @@
         }
         .status-badge.completed { background-color: #d4edda; color: #155724; }
         .status-badge.pending { background-color: #f8d7da; color: #721c24; }
+        .status-badge.coming-soon { background-color: #f1f5f9; color: #64748b; }
     </style>
 </head>
 <body>
@@ -126,22 +127,56 @@
 
 <script>
     const courseData = [
-        { id: "00", title: "0: The Art of Statistics", lessons: ["1. Collecting Data", "2. Organizing Data", "3. Presenting Data", "4. Analyzing Data", "5. Interpreting Data", "6. Finding Patterns", "7. Decision Making"] },
-        { id: "01", title: "1-1: Correlation", lessons: ["1. Introduction", "2. Scatter diagram", "3. Correlation", "4. Linear Correlation", "5. Direct Correlation", "6. Inverse Correlation", "7. Correlation Coefficient", "8. Pearson's Method", "9. Spearman's Method"] },
-        { id: "02", title: "1-2: Regression", lessons: ["1. Introduction", "2. Regression", "3. Types of Regression", "4. Method of Least Squares", "5. Regression Line"] },
-        { id: "03", title: "2-1: Stem-and-Leaf", lessons: ["1. Introduction"] },
-        { id: "04", title: "2-2: Quartile", lessons: ["1. Introduction"] },
-        { id: "05", title: "2-3: Semi-inter Quartile Range", lessons: ["1. Introduction"] },
-        { id: "06", title: "3-1: Probability", lessons: ["1. Introduction"] },
-        { id: "07", title: "3-2: Conditional Probability", lessons: ["1. Introduction"] },
-        { id: "08", title: "3-3: Independent Events", lessons: ["1. Introduction"] },
-        { id: "09", title: "4-1: Discrete Random Variable", lessons: ["1. Introduction"] },
-        { id: "10", title: "4-2: Expectation (mean) and Variance", lessons: ["1. Introduction"] },
-        { id: "11", title: "4-3: Geometric and Binomial Distributions", lessons: ["1. Introduction"] },
-        { id: "12", title: "4-4: Continuous Random Variable", lessons: ["1. Introduction"] },
-        { id: "13", title: "5-1: Normal Distribution", lessons: ["1. Introduction"] },
-        { id: "14", title: "5-2: Normal Distribution Applications", lessons: ["1. Introduction"] },
-        { id: "15", title: "5-3: Estimation and Confidence Intervals", lessons: ["1. Introduction"] }
+        {
+            id: "00",
+            title: "0: The Art of Statistics",
+            lessons: [
+                { 
+                    title: "1. Collecting Data", 
+                    items: [
+                        { name: "Lesson", path: "./lesson_00_01/lesson/lesson.html" },
+                        { name: "Explain", path: "./lesson_00_01/explain/explain.html" },
+                        { name: "Quiz", path: "./lesson_00_01/quiz/quiz.html" }
+                    ]
+                },
+                { title: "2. Organizing Data" },
+                { title: "3. Presenting Data" },
+                { title: "4. Analyzing Data" },
+                { title: "5. Interpreting Data" },
+                { title: "6. Finding Patterns" },
+                { title: "7. Decision Making" }
+            ]
+        },
+        {
+            id: "01",
+            title: "1-1: Correlation",
+            lessons: [
+                { title: "1. Introduction" }, { title: "2. Scatter diagram" }, { title: "3. Correlation" }, 
+                { title: "4. Linear Correlation" }, { title: "5. Direct Correlation" }, { title: "6. Inverse Correlation" }, 
+                { title: "7. Correlation Coefficient" }, { title: "8. Pearson's Method" }, { title: "9. Spearman's Method" }
+            ]
+        },
+        {
+            id: "02",
+            title: "1-2: Regression",
+            lessons: [
+                { title: "1. Introduction" }, { title: "2. Regression" }, { title: "3. Types of Regression" }, 
+                { title: "4. Method of Least Squares" }, { title: "5. Regression Line" }
+            ]
+        },
+        { id: "03", title: "2-1: Stem-and-Leaf", lessons: [{ title: "1. Introduction" }] },
+        { id: "04", title: "2-2: Quartile", lessons: [{ title: "1. Introduction" }] },
+        { id: "05", title: "2-3: Semi-inter Quartile Range", lessons: [{ title: "1. Introduction" }] },
+        { id: "06", title: "3-1: Probability", lessons: [{ title: "1. Introduction" }] },
+        { id: "07", title: "3-2: Conditional Probability", lessons: [{ title: "1. Introduction" }] },
+        { id: "08", title: "3-3: Independent Events", lessons: [{ title: "1. Introduction" }] },
+        { id: "09", title: "4-1: Discrete Random Variable", lessons: [{ title: "1. Introduction" }] },
+        { id: "10", title: "4-2: Expectation (mean) and Variance", lessons: [{ title: "1. Introduction" }] },
+        { id: "11", title: "4-3: Geometric and Binomial Distributions", lessons: [{ title: "1. Introduction" }] },
+        { id: "12", title: "4-4: Continuous Random Variable", lessons: [{ title: "1. Introduction" }] },
+        { id: "13", title: "5-1: Normal Distribution", lessons: [{ title: "1. Introduction" }] },
+        { id: "14", title: "5-2: Normal Distribution Applications", lessons: [{ title: "1. Introduction" }] },
+        { id: "15", title: "5-3: Estimation and Confidence Intervals", lessons: [{ title: "1. Introduction" }] }
     ];
 
     let cachedVisitedState = "";
@@ -181,46 +216,56 @@
             title.innerText = unit.title;
             card.appendChild(title);
 
-            unit.lessons.forEach((lessonName, lIdx) => {
-                const lessonNum = String(lIdx + 1).padStart(2, '0');
-                const folder = `Lesson_${unit.id}_${lessonNum}`;
+            unit.lessons.forEach((lesson) => {
+                const lessonTitle = lesson.title || lesson;
+                const hasItems = lesson.items && lesson.items.length > 0;
 
                 const lessonBlock = document.createElement('div');
                 lessonBlock.className = 'lesson-block';
 
                 const nameDiv = document.createElement('div');
                 nameDiv.className = 'lesson-name';
-                nameDiv.innerText = lessonName;
+                nameDiv.innerText = lessonTitle;
                 lessonBlock.appendChild(nameDiv);
 
                 const grid = document.createElement('div');
                 grid.className = 'module-grid';
 
-                const modules = [
-                    { name: "Lesson", path: `./${folder}/lesson/index.html` },
-                    { name: "Explain", path: `./${folder}/explain/index.html` },
-                    { name: "Quiz", path: `./${folder}/quiz/index.html` }
-                ];
+                if (hasItems) {
+                    lesson.items.forEach(mod => {
+                        totalModules++;
+                        const isDone = visitedClean.some(v => v.endsWith(cleanPath(mod.path)));
+                        if (isDone) completedModules++;
 
-                modules.forEach(mod => {
-                    totalModules++;
-                    const isDone = visitedClean.some(v => v.endsWith(cleanPath(mod.path)));
-                    if (isDone) completedModules++;
+                        const item = document.createElement('div');
+                        item.className = 'module-item';
 
+                        const modName = document.createElement('span');
+                        modName.innerText = mod.name;
+
+                        const badge = document.createElement('span');
+                        badge.className = `status-badge ${isDone ? 'completed' : 'pending'}`;
+                        badge.innerText = isDone ? 'Done ✓' : 'Pending';
+
+                        item.appendChild(modName);
+                        item.appendChild(badge);
+                        grid.appendChild(item);
+                    });
+                } else {
                     const item = document.createElement('div');
                     item.className = 'module-item';
 
                     const modName = document.createElement('span');
-                    modName.innerText = mod.name;
+                    modName.innerText = "Module Content";
 
                     const badge = document.createElement('span');
-                    badge.className = `status-badge ${isDone ? 'completed' : 'pending'}`;
-                    badge.innerText = isDone ? 'Done ✓' : 'Pending';
+                    badge.className = 'status-badge coming-soon';
+                    badge.innerText = 'Coming Soon ⏳';
 
                     item.appendChild(modName);
                     item.appendChild(badge);
                     grid.appendChild(item);
-                });
+                }
 
                 lessonBlock.appendChild(grid);
                 card.appendChild(lessonBlock);

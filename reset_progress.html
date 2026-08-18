@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Progress Matrix & Admin</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f4f4f9;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #edf2f7;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 1.6rem;
+        }
+        .btn-reset {
+            background-color: #e74c3c;
+            color: white;
+            font-size: 0.85rem;
+            padding: 10px 18px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .btn-reset:hover {
+            background-color: #c0392b;
+        }
+        .overall-progress {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .progress-title {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .progress-track {
+            background-color: #e2e8f0;
+            height: 14px;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background-color: #2ecc71;
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .unit-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+        }
+        .unit-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+        .lesson-block {
+            margin-bottom: 15px;
+        }
+        .lesson-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .module-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            font-size: 0.85rem;
+        }
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-badge.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-badge.pending {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Course Progress Matrix</h1>
+        <button class="btn-reset" onclick="resetProgress()">Reset All Progress</button>
+    </div>
+
+    <div class="overall-progress">
+        <div class="progress-title">
+            <span>Overall Completion Rate</span>
+            <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div id="matrix-wrapper"></div>
+</div>
+
+<script>
+    const courseData = [
+        {
+            id: "00",
+            title: "0: The Art of Statistics",
+            lessons: ["1. Collecting Data", "2. Organizing Data", "3. Presenting Data", "4. Analyzing Data", "5. Interpreting Data", "6. Finding Patterns", "7. Decision Making"]
+        },
+        {
+            id: "01",
+            title: "1-1: Correlation",
+            lessons: ["1. Introduction", "2. Scatter diagram", "3. Correlation", "4. Linear Correlation", "5. Direct Correlation", "6. Inverse Correlation", "7. Correlation Coefficient", "8. Pearson's Method", "9. Spearman's Method"]
+        },
+        {
+            id: "02",
+            title: "1-2: Regression",
+            lessons: ["1. Introduction", "2. Regression", "3. Types of Regression", "4. Method of Least Squares", "5. Regression Line"]
+        },
+        { id: "03", title: "2-1: Stem-and-Leaf", lessons: ["1. Introduction"] },
+        { id: "04", title: "2-2: Quartile", lessons: ["1. Introduction"] },
+        { id: "05", title: "2-3: Semi-inter Quartile Range", lessons: ["1. Introduction"] },
+        { id: "06", title: "3-1: Probability", lessons: ["1. Introduction"] },
+        { id: "07", title: "3-2: Conditional Probability", lessons: ["1. Introduction"] },
+        { id: "08", title: "3-3: Independent Events", lessons: ["1. Introduction"] },
+        { id: "09", title: "4-1: Discrete Random Variable", lessons: ["1. Introduction"] },
+        { id: "10", title: "4-2: Expectation (mean) and Variance", lessons: ["1. Introduction"] },
+        { id: "11", title: "4-3: Geometric and Binomial Distributions", lessons: ["1. Introduction"] },
+        { id: "12", title: "4-4: Continuous Random Variable", lessons: ["1. Introduction"] },
+        { id: "13", title: "5-1: Normal Distribution", lessons: ["1. Introduction"] },
+        { id: "14", title: "5-2: Normal Distribution Applications", lessons: ["1. Introduction"] },
+        { id: "15", title: "5-3: Estimation and Confidence Intervals", lessons: ["1. Introduction"] }
+    ];
+
+    let cachedVisitedState = "";
+
+    function getVisitedArray() {
+        try {
+            return JSON.parse(localStorage.getItem('yasmeen_visited') || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function cleanPath(p) {
+        return p.replace(/^(\.\/|\/)/, '').toLowerCase();
+    }
+
+    function renderMatrix() {
+        const visitedRaw = getVisitedArray();
+        const currentVisitedState = JSON.stringify(visitedRaw);
+
+        // Skip DOM rerender if data hasn't changed
+        if (currentVisitedState === cachedVisitedState) return;
+        cachedVisitedState = currentVisitedState;
+
+        const visitedClean = visitedRaw.map(p => cleanPath(p));
+        const wrapper = document.getElementById('matrix-wrapper');
+        wrapper.innerHTML = '';
+
+        let totalModules = 0;
+        let completedModules = 0;
+
+        courseData.forEach(unit => {
+            const card = document.createElement('div');
+            card.className = 'unit-card';
+
+            const title = document.createElement('div');
+            title.className = 'unit-title';
+            title.innerText = unit.title;
+            card.appendChild(title);
+
+            unit.lessons.forEach((lessonName, lIdx) => {
+                const lessonNum = String(lIdx + 1).padStart(2, '0');
+                const folder = `Lesson_${unit.id}_${lessonNum}`;
+
+                const lessonBlock = document.createElement('div');
+                lessonBlock.className = 'lesson-block';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'lesson-name';
+                nameDiv.innerText = lessonName;
+                lessonBlock.appendChild(nameDiv);
+
+                const grid = document.createElement('div');
+                grid.className = 'module-grid';
+
+                const modules = [
+                    { name: "Lesson", path: `./${folder}/lesson/index.html` },
+                    { name: "Explain", path: `./${folder}/explain/index.html` },
+                    { name: "Quiz", path: `./${folder}/quiz/index.html` }
+                ];
+
+                modules.forEach(mod => {
+                    totalModules++;
+                    const isDone = visitedClean.some(v => v.endsWith(cleanPath(mod.path)));
+                    if (isDone) completedModules++;
+
+                    const item = document.createElement('div');
+                    item.className = 'module-item';
+
+                    const modName = document.createElement('span');
+                    modName.innerText = mod.name;
+
+                    const badge = document.createElement('span');
+                    badge.className = `status-badge ${isDone ? 'completed' : 'pending'}`;
+                    badge.innerText = isDone ? 'Done ✓' : 'Pending';
+
+                    item.appendChild(modName);
+                    item.appendChild(badge);
+                    grid.appendChild(item);
+                });
+
+                lessonBlock.appendChild(grid);
+                card.appendChild(lessonBlock);
+            });
+
+            wrapper.appendChild(card);
+        });
+
+        const percent = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
+        document.getElementById('progress-percent').innerText = `${percent}% (${completedModules}/${totalModules} Modules)`;
+        document.getElementById('progress-fill').style.width = `${percent}%`;
+    }
+
+    function resetProgress() {
+        if (confirm("WARNING: This will wipe all saved course completion state from this browser. Proceed?")) {
+            localStorage.removeItem('yasmeen_visited');
+            localStorage.removeItem('yasmeen_last_url');
+            renderMatrix();
+        }
+    }
+
+    // Hybrid triggers for real-time synchronization
+    window.addEventListener('storage', renderMatrix);
+    window.addEventListener('focus', renderMatrix);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) renderMatrix();
+    });
+
+    setInterval(() => {
+        if (!document.hidden) renderMatrix();
+    }, 1500);
+
+    window.onload = renderMatrix;
+</script>
+</body>
+</html>

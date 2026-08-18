@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics: Collecting Data - Quiz</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Layout */
+        #quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 1.4rem;
+            text-align: left;
+        }
+
+        .btn-fullscreen {
+            background-color: #2c3e50;
+            color: white;
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .question-card, .result-card {
+            display: none;
+        }
+        .question-card.active, .result-card.active {
+            display: block;
+        }
+
+        /* Timer Bar */
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-badge {
+            background-color: #e2e8f0;
+            color: #1e293b;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .timer-badge.warning {
+            background-color: #e74c3c;
+            color: #ffffff;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .question-text, .result-title {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+        .option-container {
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .option-container:hover {
+            background-color: #f5f6fa;
+        }
+        .option-container input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .option-text {
+            font-size: 1rem;
+            color: #2f3640;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.4;
+        }
+        .feedback.correct {
+            display: block;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.incorrect {
+            display: block;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .feedback.timeout {
+            display: block;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed !important;
+        }
+        .btn-prev, .btn-retry {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+        }
+
+        /* Result Specific Box */
+        .score-box {
+            text-align: center;
+            padding: 30px 15px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+        .score-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        .status-message {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .status-message.passed { color: #2ecc71; }
+        .status-message.failed { color: #e74c3c; }
+
+        /* Fullscreen Layout Fix */
+        .quiz-container:fullscreen {
+            max-width: 100vw;
+            width: 100vw;
+            min-height: 100vh;
+            height: auto;
+            border-radius: 0;
+            padding: 30px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-container">
+    <div id="quiz-header">
+        <h1 id="main-title">Statistics: Collecting Data - Quiz</h1>
+        <button class="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
+    </div>
+
+    <div id="questions-wrapper"></div>
+
+    <div id="result-wrapper" class="result-card">
+        <div class="result-title">Final Result</div>
+        <div class="score-box">
+            <div class="score-display" id="final-score">0 / 9</div>
+            <div class="status-message" id="status-message"></div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn-retry" onclick="restartQuiz()">Retry</button>
+            <button class="btn-next" id="btn-next-result" onclick="nextLesson()">Exit Fullscreen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const QUESTION_TIMEOUT_SECONDS = 19;
+
+    const quizData = [
+        {
+            question: "According to the lesson, what is the very first step in the 'art of statistics'?",
+            options: [
+                { text: "Collecting data", isCorrect: true, feedback: "The source material explicitly defines statistics as an art starting with the gathering of necessary information." },
+                { text: "Drawing a map", isCorrect: false, feedback: "While Yasmeen uses a map for her investigation, it is a tool for visualization rather than the formal first step of statistics." },
+                { text: "Making a guess", isCorrect: false, feedback: "The material clarifies that a guess is not the same as evidence or data collection." },
+                { text: "Catching the thief", isCorrect: false, feedback: "Catching the thief is the end goal of the investigation, but statistics begins with the foundational step of gathering information." }
+            ]
+        },
+        {
+            question: "What specific treasure was reported missing from the Alexandria Museum?",
+            options: [
+                { text: "The Golden Star of Alexandria", isCorrect: true, feedback: "This is the primary artifact identified as stolen in the dialogue between Yasmeen and the robot." },
+                { text: "An Ancient Egyptian Sarcophagus", isCorrect: false, feedback: "While a sarcophagus is visible in the background of the museum, it was not the object that triggered the alarm." },
+                { text: "The Silver Compass", isCorrect: false, feedback: "A compass is shown on Yasmeen's desk later, but it is a tool for her work, not the missing treasure." },
+                { text: "The Alexandria Library Scroll", isCorrect: false, feedback: "An open book is seen in a display case, but the dialogue focuses specifically on a missing star." }
+            ]
+        },
+        {
+            question: "How does the source material define 'collecting' in the context of data?",
+            options: [
+                { text: "Gathering the information we need", isCorrect: true, feedback: "The definition provided in the text equates collecting with the process of gathering necessary information." },
+                { text: "Organizing files into a neat stack", isCorrect: false, feedback: "The source notes that the data collected was actually messy and disorganized, indicating that collection comes before organization." },
+                { text: "Finding clues with a magnifying glass", isCorrect: false, feedback: "While finding clues is part of investigating, the statistical definition specifically refers to information gathering." },
+                { text: "Interviewing only the guards", isCorrect: false, feedback: "Interviewing guards is one method of gathering data, but the definition is broader than a single method." }
+            ]
+        },
+        {
+            question: "Why did Detective Yasmeen tell the robot that the Harbor was just a 'guess'?",
+            options: [
+                { text: "Because there was no information or evidence for it yet", isCorrect: true, feedback: "The lesson emphasizes that a guess lacks the supporting information that constitutes real evidence." },
+                { text: "Because the thief definitely went to the Old Tower", isCorrect: false, feedback: "At that point in the story, the destination of the thief was unknown to both characters." },
+                { text: "Because the robot's map was upside down", isCorrect: false, feedback: "The museum records were upside down, but the robot's map was displayed correctly on the wall." },
+                { text: "Because it was the furthest location on the map", isCorrect: false, feedback: "The distance of the location did not determine if it was a guess; the lack of evidence did." }
+            ]
+        },
+        {
+            question: "What is the definition of 'evidence' provided in the lesson?",
+            options: [
+                { text: "Information of real-life events", isCorrect: true, feedback: "The source explicitly states that information serves as evidence for things that have actually occurred." },
+                { text: "A trail of glowing blue light", isCorrect: false, feedback: "While the light trail is a clue in the story, the formal definition of evidence is linked to information." },
+                { text: "A badge worn by a detective", isCorrect: false, feedback: "A badge is a symbol of authority, not the definition of information used in statistics." },
+                { text: "The testimony of a museum guard", isCorrect: false, feedback: "Testimony can be a source of information, but the definition covers all information regarding real-life events." }
+            ]
+        },
+        {
+            question: "In the story, Detective Yasmeen collects logs from the last how many nights?",
+            options: [
+                { text: "7 nights", isCorrect: true, feedback: "Yasmeen specifically asks the guards for the records covering the last 7 nights of activity." },
+                { text: "1 night", isCorrect: false, feedback: "While the robbery just happened, Yasmeen needs a larger set of data to analyze patterns." },
+                { text: "14 nights", isCorrect: false, feedback: "Incorrect. The correct answer is 7 nights." },
+                { text: "30 nights", isCorrect: false, feedback: "Requesting a month of data would be more than what was shown in the guards' messy stack of papers." }
+            ]
+        },
+        {
+            question: "Which of the following was NOT a problem with the data (logs) Yasmeen received?",
+            options: [
+                { text: "The handwriting was illegible", isCorrect: true, feedback: "While the records were messy, upside down, and stained with tea, the source never specifically mentions illegible handwriting." },
+                { text: "Some were covered in tea", isCorrect: false, feedback: "The text explicitly states that one of the records was covered in tea." },
+                { text: "Some were upside down", isCorrect: false, feedback: "The source mentions that the records were positioned incorrectly." },
+                { text: "The records were messy", isCorrect: false, feedback: "This is the general description given for the state of the logs provided by the guards." }
+            ]
+        },
+        {
+            question: "What advice does Yasmeen give for understanding a large amount of information?",
+            options: [
+                { text: "One step at a time", isCorrect: true, feedback: "Yasmeen suggests a methodical, incremental approach to processing the complex data gathered." },
+                { text: "Always trust your first guess", isCorrect: false, feedback: "She actually warns against using guesses without finding supporting information first." },
+                { text: "Ask a robot to calculate it", isCorrect: false, feedback: "Although she has a robot assistant, she emphasizes her own methodical process for understanding the data." },
+                { text: "Ignore the messy parts", isCorrect: false, feedback: "A detective must look at all data, even the messy parts, to find the truth." }
+            ]
+        },
+        {
+            question: "If statistics is an 'art' consisting of multiple actions, which action is the primary focus of Lesson?",
+            options: [
+                { text: "Action 1: Collecting data", isCorrect: true, feedback: "The lesson repeatedly identifies 'collecting data' as the first step and the focus of the current session." },
+                { text: "Action 2: Organizing data", isCorrect: false, feedback: "The material shows the data being collected in a messy state, implying that organization happens in a later step." },
+                { text: "Action 7: Final Conclusion", isCorrect: false, feedback: "As the final step, this would be the conclusion of the series, whereas Lesson focuses on the beginning." },
+                { text: "Action 5: Drawing Graphs", isCorrect: false, feedback: "Graphs are a way to represent data, but the foundation must be the collection of that data first." }
+            ]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let studentAnswers = {};
+    
+    let timeLeft = [];
+    let isExpired = [];
+    let activeTimer = null;
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function initTimerArrays() {
+        timeLeft = quizData.map(() => QUESTION_TIMEOUT_SECONDS);
+        isExpired = quizData.map(() => false);
+    }
+
+    function generateQuiz() {
+        initTimerArrays();
+        const wrapper = document.getElementById('questions-wrapper');
+        wrapper.innerHTML = '';
+        
+        quizData.forEach((q, qIndex) => {
+            const card = document.createElement('div');
+            card.className = `question-card ${qIndex === 0 ? 'active' : ''}`;
+            card.id = `q-card-${qIndex}`;
+
+            const qHeader = document.createElement('div');
+            qHeader.className = 'question-header';
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerText = `${qIndex + 1}. ${q.question}`;
+            qHeader.appendChild(qText);
+
+            const timerBadge = document.createElement('div');
+            timerBadge.className = 'timer-badge';
+            timerBadge.id = `timer-badge-${qIndex}`;
+            timerBadge.innerText = `⏱️ 00:${String(QUESTION_TIMEOUT_SECONDS).padStart(2, '0')}`;
+            qHeader.appendChild(timerBadge);
+
+            card.appendChild(qHeader);
+
+            const scrambledOptions = shuffle([...q.options]);
+
+            scrambledOptions.forEach((opt, oIndex) => {
+                const label = document.createElement('label');
+                label.className = 'option-container';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `question-${qIndex}`;
+                radio.value = oIndex;
+                radio.onclick = () => handleAnswerSelect(qIndex, opt, card);
+
+                const span = document.createElement('span');
+                span.className = 'option-text';
+                span.innerText = opt.text;
+
+                label.appendChild(radio);
+                label.appendChild(span);
+                card.appendChild(label);
+            });
+
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = 'feedback';
+            feedbackDiv.id = `feedback-${qIndex}`;
+            card.appendChild(feedbackDiv);
+
+            const navDiv = document.createElement('div');
+            navDiv.className = 'nav-buttons';
+
+            if (qIndex > 0) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'btn-prev';
+                prevBtn.innerText = 'Previous';
+                prevBtn.onclick = () => navigate(-1);
+                navDiv.appendChild(prevBtn);
+            } else {
+                navDiv.appendChild(document.createElement('div'));
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn-next';
+            nextBtn.id = `btn-next-${qIndex}`;
+            nextBtn.innerText = qIndex === quizData.length - 1 ? 'Finish' : 'Next';
+            nextBtn.disabled = true;
+            nextBtn.onclick = () => {
+                if (qIndex === quizData.length - 1) {
+                    showResults();
+                } else {
+                    navigate(1);
+                }
+            };
+            navDiv.appendChild(nextBtn);
+
+            card.appendChild(navDiv);
+            wrapper.appendChild(card);
+        });
+
+        startTimerForQuestion(0);
+    }
+
+    function startTimerForQuestion(qIndex) {
+        if (activeTimer) clearInterval(activeTimer);
+
+        updateTimerDisplay(qIndex);
+        updateNextButtonState(qIndex);
+
+        // Do not run active timer if already answered or expired
+        if (timeLeft[qIndex] <= 0 || isExpired[qIndex] || studentAnswers[qIndex] !== undefined) {
+            return;
+        }
+
+        activeTimer = setInterval(() => {
+            timeLeft[qIndex]--;
+
+            updateTimerDisplay(qIndex);
+
+            if (timeLeft[qIndex] <= 0) {
+                clearInterval(activeTimer);
+                handleQuestionTimeout(qIndex);
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (activeTimer) {
+            clearInterval(activeTimer);
+            activeTimer = null;
+        }
+    }
+
+    function updateTimerDisplay(qIndex) {
+        const badge = document.getElementById(`timer-badge-${qIndex}`);
+        if (!badge) return;
+
+        const sec = String(Math.max(0, timeLeft[qIndex])).padStart(2, '0');
+        badge.innerText = `00:${sec}`;
+
+        if (timeLeft[qIndex] <= 3 && timeLeft[qIndex] > 0) {
+            badge.classList.add('warning');
+        } else {
+            badge.classList.remove('warning');
+        }
+    }
+
+    function handleQuestionTimeout(qIndex) {
+        isExpired[qIndex] = true;
+        const cardElement = document.getElementById(`q-card-${qIndex}`);
+        
+        const radios = cardElement.querySelectorAll('input[type="radio"]');
+        radios.forEach(r => r.disabled = true);
+
+        if (studentAnswers[qIndex] === undefined) {
+            const feedbackDiv = document.getElementById(`feedback-${qIndex}`);
+            feedbackDiv.className = 'feedback timeout';
+            feedbackDiv.innerText = "Time Expired! You didn't answer in time (0 points).";
+            studentAnswers[qIndex] = 0;
+        }
+
+        updateNextButtonState(qIndex);
+    }
+
+    function updateNextButtonState(qIndex) {
+        const nextBtn = document.getElementById(`btn-next-${qIndex}`);
+        if (!nextBtn) return;
+
+        const hasAnswered = studentAnswers[qIndex] !== undefined;
+        const expired = isExpired[qIndex] || timeLeft[qIndex] <= 0;
+
+        // Immediately unlock if answered or if time expired
+        if (hasAnswered || expired) {
+            nextBtn.disabled = false;
+        } else {
+            nextBtn.disabled = true;
+        }
+    }
+
+    function handleAnswerSelect(qIndex, selectedOption, cardElement) {
+        if (studentAnswers[qIndex] !== undefined || isExpired[qIndex]) return; 
+
+        // Stop countdown immediately upon selecting an answer
+        stopTimer();
+
+        studentAnswers[qIndex] = selectedOption.isCorrect ? 1 : 0;
+        
+        const feedbackDiv = document.getElementById(`feedback-${qIndex}`);
+        const radios = cardElement.querySelectorAll('input[type="radio"]');
+        radios.forEach(r => r.disabled = true);
+
+        if (selectedOption.isCorrect) {
+            feedbackDiv.className = 'feedback correct';
+            feedbackDiv.innerText = `Correct (+1)\n\n${selectedOption.feedback}`;
+        } else {
+            feedbackDiv.className = 'feedback incorrect';
+            feedbackDiv.innerText = `Incorrect (0)\n\n${selectedOption.feedback}`;
+        }
+
+        updateNextButtonState(qIndex);
+    }
+
+    function navigate(direction) {
+        stopTimer();
+
+        const currentCard = document.getElementById(`q-card-${currentQuestionIndex}`);
+        currentCard.classList.remove('active');
+
+        currentQuestionIndex += direction;
+
+        const nextCard = document.getElementById(`q-card-${currentQuestionIndex}`);
+        nextCard.classList.add('active');
+
+        startTimerForQuestion(currentQuestionIndex);
+    }
+
+    function recordQuizCompletion(score) {
+        if (score < 6) return;
+
+        try {
+            const fullPath = window.location.pathname;
+            const match = fullPath.match(/\/(Lesson_[^\/]+\/quiz\/index\.html)/);
+            const relativeUrl = match ? `./${match[1]}` : fullPath;
+
+            let visited = JSON.parse(localStorage.getItem('yasmeen_visited') || '[]');
+            if (!visited.includes(relativeUrl)) {
+                visited.push(relativeUrl);
+                localStorage.setItem('yasmeen_visited', JSON.stringify(visited));
+            }
+        } catch (e) {
+            console.error("Failed to record completion to localStorage:", e);
+        }
+    }
+
+    function showResults() {
+        stopTimer();
+        document.getElementById('questions-wrapper').style.display = 'none';
+        
+        let totalScore = 0;
+        for (let i = 0; i < quizData.length; i++) {
+            totalScore += (studentAnswers[i] || 0);
+        }
+
+        document.getElementById('final-score').innerText = `${totalScore} / ${quizData.length}`;
+        
+        const statusMsg = document.getElementById('status-message');
+        if (totalScore >= 6) {
+            statusMsg.innerText = "PASSED! Progress Recorded ✓";
+            statusMsg.className = "status-message passed";
+            recordQuizCompletion(totalScore);
+        } else {
+            statusMsg.innerText = "FAILED (Score < 6). Try Again to Pass!";
+            statusMsg.className = "status-message failed";
+        }
+
+        document.getElementById('result-wrapper').classList.add('active');
+        updateFullscreenResultButton();
+    }
+
+    function restartQuiz() {
+        stopTimer();
+        currentQuestionIndex = 0;
+        studentAnswers = {};
+        document.getElementById('result-wrapper').classList.remove('active');
+        document.getElementById('questions-wrapper').style.display = 'block';
+        generateQuiz();
+    }
+
+    function nextLesson() {
+        if (document.fullscreenElement) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    }
+
+    function updateFullscreenResultButton() {
+        const nextBtn = document.getElementById('btn-next-result');
+        if (!nextBtn) return;
+
+        if (document.fullscreenElement) {
+            nextBtn.disabled = false;
+            nextBtn.innerText = 'Exit Fullscreen';
+        } else {
+            nextBtn.disabled = true;
+            nextBtn.innerText = 'Next';
+        }
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenResultButton);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenResultButton);
+    document.addEventListener('msfullscreenchange', updateFullscreenResultButton);
+
+    function toggleFullscreen() {
+        const container = document.getElementById('quiz-container');
+        if (!document.fullscreenElement) {
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            } else if (container.webkitRequestFullscreen) {
+                container.webkitRequestFullscreen();
+            } else if (container.msRequestFullscreen) {
+                container.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    document.addEventListener('keydown', function(event) {
+        const resultCard = document.getElementById('result-wrapper');
+        if (resultCard.classList.contains('active')) return;
+
+        const currentNextBtn = document.getElementById(`btn-next-${currentQuestionIndex}`);
+
+        if (event.key === 'ArrowRight' || event.key === ' ') {
+            event.preventDefault();
+            if (currentNextBtn && !currentNextBtn.disabled) {
+                if (currentQuestionIndex === quizData.length - 1) {
+                    showResults();
+                } else {
+                    navigate(1);
+                }
+            }
+        } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            if (currentQuestionIndex > 0) {
+                navigate(-1);
+            }
+        }
+    });
+
+    window.onload = generateQuiz;
+</script>
+
+</body>
+</html>
